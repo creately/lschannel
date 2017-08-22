@@ -1,3 +1,23 @@
-# typescript-module-starter
+# lschannel
 
-A bare minimum starter repository for client side npm modules written in typescript. Includes `prettier` for linting, `karma` and `jasmine` for unit tests and `istanbul` for coverage. Uses `webpack` to transpile typescript when running tests. To get started, clone this repository and run npm install.
+Send and receive messages across multiple tabs and windows. To get started, first install the module with npm.
+
+```shell
+npm install @creately/lschannel
+```
+
+When creating a channel, provide a unique key to identify the channel. The key will be the key on localStorage data will be stored on.
+
+```ts
+import { Channel } from '@creately/lschannel';
+
+const ch = new Channel<number>('unique-key');
+
+ch.recv().subscribe((n: number) => {
+  console.log('received', n)
+});
+
+ch.send(1);
+ch.send(2);
+ch.send(3);
+```

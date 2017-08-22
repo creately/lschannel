@@ -13,10 +13,12 @@ import { Channel } from '@creately/lschannel';
 
 const ch = new Channel<number>('unique-key');
 
+// subscribe to data
 ch.recv().subscribe((n: number) => {
   console.log('received', n)
 });
 
+// on a different tab
 ch.send(1);
 ch.send(2);
 ch.send(3);

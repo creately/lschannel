@@ -1,6 +1,6 @@
 # lschannel
 
-Send and receive messages across multiple tabs and windows. To get started, first install the module with npm.
+Send and receive messages across multiple tabs and windows. LocalStorage channels extend the RxJS subject to provide an api which will work well with applications which use Observables. To get started, first install the module with npm.
 
 ```shell
 npm install @creately/lschannel
@@ -11,15 +11,16 @@ When creating a channel, provide a unique key to identify the channel. The key w
 ```ts
 import { Channel } from '@creately/lschannel';
 
+// create a channel
 const ch = Channel.create<number>('unique-key');
 
 // subscribe to data
-ch.recv().subscribe((n: number) => {
+ch.subscribe((n: number) => {
   console.log('received', n)
 });
 
 // on a different tab
-ch.send(1);
-ch.send(2);
-ch.send(3);
+ch.next(1);
+ch.next(2);
+ch.next(3);
 ```

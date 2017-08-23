@@ -1,43 +1,44 @@
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
-export class Channel<T> {
-  // local
-  // local is an observable of lschannel events
-  public events: Observable<T>;
+export class Channel<T> extends Subject<T> {
+  private static instances: Map<string, Channel<any>> = new Map();
 
-  // constructor
-  // constructor creates a new LsChannel instance. The key parameter
-  // is mandatory and will be used as the localStorage key.
-  constructor(public key: string) {
-    this.events = Observable.fromEvent<any>(window, 'storage')
-      .filter(e => e.key === this.key)
-      .map(e => JSON.parse(e.newValue).data);
+  // create
+  // create creates a new Channel instance. If a channel already exists
+  // with given name, it will return the existing instance without creating.
+  public static create<T>(key: string): Channel<T> {
+    const existingChannel = this.instances.get(key);
+    if (existingChannel) {
+      return existingChannel;
+    }
+    const newChannel = new Channel<T>(key);
+    this.instances.set(key, newChannel);
+    return newChannel;
   }
 
-  // send
-  // send sets the value on localStorage for given key which
-  // will trigger a 'storage' event on other listening windows.
-  public send(data: T): void {
+  // constructor
+  private constructor(public key: string) {
+    super();
+    Observable.fromEvent<any>(window, 'storage')
+      .filter(e => e.key === this.key)
+      .map(e => JSON.parse(e.newValue).data)
+      .subscribe(data => this.emit(data));
+  }
+
+  // next
+  // next sets the value on localStorage for given key which
+  // will trigger a 'storage' event on listening windows/tabs.
+  public next(data: T): void {
     const event = { id: this.randomId(), data };
     const value = JSON.stringify(event);
     localStorage.setItem(this.key, value);
-    this.dispatch(value);
+    this.emit(data);
   }
 
-  // recv
-  // recv returns an observable which will emit lschannel events
-  // triggered by other windows. Events created by this window
-  // will not trigger a "storage" event so it will not emit.
-  public recv(): Observable<T> {
-    return this.events;
-  }
-
-  // dispatch
-  // dispatch emits a "storage" event on window object. It will use
-  // the lschannel key as the key and given value as newValue.
-  private dispatch(value: string) {
-    const storageEvent = new StorageEvent('storage', { key: this.key, newValue: value, url: location.href });
-    window.dispatchEvent(storageEvent);
+  // emit
+  // emit emits the data to all subscribers in this window/tab.
+  private emit(data: T): void {
+    super.next(data);
   }
 
   // randomId

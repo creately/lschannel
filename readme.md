@@ -11,7 +11,7 @@ When creating a channel, provide a unique key to identify the channel. The key w
 ```ts
 import { Channel } from '@creately/lschannel';
 
-const ch = new Channel<number>('unique-key');
+const ch = Channel.create<number>('unique-key');
 
 // subscribe to data
 ch.recv().subscribe((n: number) => {

@@ -10,12 +10,8 @@ describe('Channel', () => {
   it('should emit when window emits a "storage" event with watched key', async () => {
     const { key, ch } = prepare();
     const promise = ch.take(2).toArray().toPromise();
-    window.dispatchEvent(
-      new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e1', data: 1 }) } as any)
-    );
-    window.dispatchEvent(
-      new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any)
-    );
+    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e1', data: 1 }) } as any));
+    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any));
     const result = await promise;
     expect(result).toEqual([1, 2]);
   });
@@ -45,9 +41,7 @@ describe('Channel', () => {
     window.dispatchEvent(
       new StorageEvent('storage', { key: 'not-key', newValue: JSON.stringify({ id: 'e1', data: 1 }) } as any)
     );
-    window.dispatchEvent(
-      new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any)
-    );
+    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any));
     const result = await promise;
     expect(result).toEqual([2]);
   });
@@ -56,9 +50,7 @@ describe('Channel', () => {
     const { key, ch } = prepare();
     const promise = ch.take(1).toArray().toPromise();
     localStorage.setItem(key, JSON.stringify({ id: 'e1', data: 1 }));
-    window.dispatchEvent(
-      new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any)
-    );
+    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any));
     const result = await promise;
     expect(result).toEqual([2]);
   });

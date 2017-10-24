@@ -36,6 +36,6 @@
     "webpack": "^3.5.5"
   },
   "dependencies": {
-    "rxjs": "^5.0.0"
+    "rxjs": "^5.5.0"
   }
 }

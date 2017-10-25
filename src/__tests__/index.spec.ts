@@ -1,5 +1,3 @@
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/toArray';
 import { Channel } from '../';
 
 describe('Channel', () => {

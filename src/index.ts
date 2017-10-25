@@ -1,8 +1,5 @@
-import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Rx';
+import { Subject } from 'rxjs/Rx';
 
 export class Channel<T> extends Subject<T> {
   private static instances: Map<string, Channel<any>> = new Map();

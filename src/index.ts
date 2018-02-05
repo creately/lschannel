@@ -47,7 +47,9 @@ export class Channel<T> extends Subject<T> {
   private randomId(): string {
     let id = '';
     while (id.length < 16) {
-      const r = Math.random().toString(36).slice(2);
+      const r = Math.random()
+        .toString(36)
+        .slice(2);
       id += r.slice(0, 16 - id.length);
     }
     return id;

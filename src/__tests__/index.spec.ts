@@ -9,7 +9,10 @@ describe('Channel', () => {
 
   it('should emit when window emits a "storage" event with watched key', async () => {
     const { key, ch } = prepare();
-    const promise = ch.take(2).toArray().toPromise();
+    const promise = ch
+      .take(2)
+      .toArray()
+      .toPromise();
     window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e1', data: 1 }) } as any));
     window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any));
     const result = await promise;
@@ -18,7 +21,10 @@ describe('Channel', () => {
 
   it('should emit when the send method is called on the same instance', async () => {
     const { ch } = prepare();
-    const promise = ch.take(2).toArray().toPromise();
+    const promise = ch
+      .take(2)
+      .toArray()
+      .toPromise();
     ch.next(1);
     ch.next(2);
     const result = await promise;
@@ -27,7 +33,10 @@ describe('Channel', () => {
 
   it('should emit when the send method is called on the an instance with same key', async () => {
     const { key, ch } = prepare();
-    const promise = ch.take(2).toArray().toPromise();
+    const promise = ch
+      .take(2)
+      .toArray()
+      .toPromise();
     const ch2 = Channel.create<number>(key);
     ch2.next(1);
     ch2.next(2);
@@ -37,7 +46,10 @@ describe('Channel', () => {
 
   it('should not emit when window emits a "storage" event with different key', async () => {
     const { key, ch } = prepare();
-    const promise = ch.take(1).toArray().toPromise();
+    const promise = ch
+      .take(1)
+      .toArray()
+      .toPromise();
     window.dispatchEvent(
       new StorageEvent('storage', { key: 'not-key', newValue: JSON.stringify({ id: 'e1', data: 1 }) } as any)
     );
@@ -48,7 +60,10 @@ describe('Channel', () => {
 
   it('should not emit when localStorage is changed in current browser window', async () => {
     const { key, ch } = prepare();
-    const promise = ch.take(1).toArray().toPromise();
+    const promise = ch
+      .take(1)
+      .toArray()
+      .toPromise();
     localStorage.setItem(key, JSON.stringify({ id: 'e1', data: 1 }));
     window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any));
     const result = await promise;

@@ -1,6 +1,7 @@
-import { Observable } from 'rxjs/Rx';
-import { Subject } from 'rxjs/Rx';
+import { Subject } from 'rxjs';
 
+// Channel
+// Channel ...
 export class Channel<T> extends Subject<T> {
   private static instances: Map<string, Channel<any>> = new Map();
 
@@ -14,26 +15,68 @@ export class Channel<T> extends Subject<T> {
     }
     const newChannel = new Channel<T>(key);
     this.instances.set(key, newChannel);
+    newChannel.init();
     return newChannel;
   }
+
+  // randomId
+  // randomId generates a reasonably random string id with given length.
+  private static randomId(n: number) {
+    let id = '';
+    while (id.length < n) {
+      id += Math.random()
+        .toString(16)
+        .slice(2);
+    }
+    return id.slice(0, n);
+  }
+
+  // prefix
+  // prefix is used to generate random ids for each message send over the channel.
+  private prefix: string;
+
+  // counter
+  // counter is used to generate random ids for each message send over the channel.
+  private counter: number;
 
   // constructor
   private constructor(public key: string) {
     super();
-    Observable.fromEvent<any>(window, 'storage')
-      .filter(e => e.key === this.key)
-      .map(e => JSON.parse(e.newValue).data)
-      .subscribe(data => this.emit(data));
+    this.prefix = Channel.randomId(16);
+    this.counter = 0;
+    this.handler = this.handler.bind(this);
+  }
+
+  // close
+  // close ...
+  public close() {
+    window.removeEventListener('storage', this.handler);
   }
 
   // next
   // next sets the value on localStorage for given key which
   // will trigger a 'storage' event on listening windows/tabs.
   public next(data: T): void {
-    const event = { id: this.randomId(), data };
+    const event = { id: this.nextId(), data };
     const value = JSON.stringify(event);
     localStorage.setItem(this.key, value);
     this.emit(data);
+  }
+
+  // init
+  // init ...
+  private init() {
+    window.addEventListener('storage', this.handler);
+  }
+
+  // handler
+  // handler ...
+  private handler(e: StorageEvent) {
+    if (e.key !== this.key) {
+      return;
+    }
+    const event = JSON.parse(e.newValue as string);
+    this.emit(event.data);
   }
 
   // emit
@@ -42,16 +85,9 @@ export class Channel<T> extends Subject<T> {
     super.next(data);
   }
 
-  // randomId
-  // randomId creates a random string which will be used as event ids.
-  private randomId(): string {
-    let id = '';
-    while (id.length < 16) {
-      const r = Math.random()
-        .toString(36)
-        .slice(2);
-      id += r.slice(0, 16 - id.length);
-    }
-    return id;
+  // nextId
+  // nextId ...
+  private nextId() {
+    return this.prefix + ++this.counter;
   }
 }

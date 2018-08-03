@@ -1,3 +1,4 @@
+import { take, toArray } from 'rxjs/operators';
 import { Channel } from '../';
 
 describe('Channel', () => {
@@ -7,67 +8,80 @@ describe('Channel', () => {
     return { key, ch };
   }
 
-  it('should emit when window emits a "storage" event with watched key', async () => {
+  function takeAndTest(count: number, action: Function, assert: Function, done: Function) {
     const { key, ch } = prepare();
-    const promise = ch
-      .take(2)
-      .toArray()
-      .toPromise();
-    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e1', data: 1 }) } as any));
-    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any));
-    const result = await promise;
-    expect(result).toEqual([1, 2]);
+    ch.pipe(
+      take(count),
+      toArray()
+    ).subscribe({
+      next: val => assert(val),
+      error: err => fail(err),
+      complete: () => done(),
+    });
+    action(key, ch);
+  }
+
+  const dispatchEvent = (key: string, val: any) => {
+    const event = new StorageEvent('storage', { key, newValue: JSON.stringify(val) } as any);
+    window.dispatchEvent(event);
+  };
+
+  it('should emit when window emits a "storage" event with watched key', done => {
+    const action = (key: string, _ch: Channel<number>) => {
+      dispatchEvent(key, { id: 'e1', data: 1 });
+      dispatchEvent(key, { id: 'e2', data: 2 });
+    };
+    const assert = (val: any) => {
+      expect(val).toEqual([1, 2]);
+    };
+    takeAndTest(2, action, assert, done);
   });
 
-  it('should emit when the send method is called on the same instance', async () => {
-    const { ch } = prepare();
-    const promise = ch
-      .take(2)
-      .toArray()
-      .toPromise();
-    ch.next(1);
-    ch.next(2);
-    const result = await promise;
-    expect(result).toEqual([1, 2]);
+  it('should emit when the send method is called on the same instance', done => {
+    const action = (_key: string, ch: Channel<number>) => {
+      ch.next(1);
+      ch.next(2);
+    };
+    const assert = (val: any) => {
+      expect(val).toEqual([1, 2]);
+    };
+    takeAndTest(2, action, assert, done);
   });
 
-  it('should emit when the send method is called on the an instance with same key', async () => {
-    const { key, ch } = prepare();
-    const promise = ch
-      .take(2)
-      .toArray()
-      .toPromise();
-    const ch2 = Channel.create<number>(key);
-    ch2.next(1);
-    ch2.next(2);
-    const result = await promise;
-    expect(result).toEqual([1, 2]);
+  it('should emit when the send method is called on the an instance with same key', done => {
+    const action = (key: string, ch: Channel<number>) => {
+      const ch2 = Channel.create<number>(key);
+      ch.next(1);
+      ch2.next(2);
+    };
+    const assert = (val: any) => {
+      expect(val).toEqual([1, 2]);
+    };
+    takeAndTest(2, action, assert, done);
   });
 
-  it('should not emit when window emits a "storage" event with different key', async () => {
-    const { key, ch } = prepare();
-    const promise = ch
-      .take(1)
-      .toArray()
-      .toPromise();
-    window.dispatchEvent(
-      new StorageEvent('storage', { key: 'not-key', newValue: JSON.stringify({ id: 'e1', data: 1 }) } as any)
-    );
-    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any));
-    const result = await promise;
-    expect(result).toEqual([2]);
+  it('should not emit when window emits a "storage" event with different key', done => {
+    const action = (key: string, _ch: Channel<number>) => {
+      dispatchEvent('not-' + key, { id: 'e0', data: 0 });
+      dispatchEvent(key, { id: 'e1', data: 1 });
+      dispatchEvent(key, { id: 'e2', data: 2 });
+    };
+    const assert = (val: any) => {
+      expect(val).toEqual([1, 2]);
+    };
+    takeAndTest(2, action, assert, done);
   });
 
-  it('should not emit when localStorage is changed in current browser window', async () => {
-    const { key, ch } = prepare();
-    const promise = ch
-      .take(1)
-      .toArray()
-      .toPromise();
-    localStorage.setItem(key, JSON.stringify({ id: 'e1', data: 1 }));
-    window.dispatchEvent(new StorageEvent('storage', { key, newValue: JSON.stringify({ id: 'e2', data: 2 }) } as any));
-    const result = await promise;
-    expect(result).toEqual([2]);
+  it('should not emit when localStorage is changed in current browser window', done => {
+    const action = (key: string, _ch: Channel<number>) => {
+      localStorage.setItem(key, JSON.stringify({ id: 'e0', data: 0 }));
+      dispatchEvent(key, { id: 'e1', data: 1 });
+      dispatchEvent(key, { id: 'e2', data: 2 });
+    };
+    const assert = (val: any) => {
+      expect(val).toEqual([1, 2]);
+    };
+    takeAndTest(2, action, assert, done);
   });
 
   describe('next', () => {

@@ -1,5 +1,7 @@
 # lschannel
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/creately/lschannel.svg)](https://greenkeeper.io/)
+
 Send and receive messages across multiple tabs and windows. LocalStorage channels extend the RxJS subject to provide an api which will work well with applications which use Observables. To get started, first install the module with npm.
 
 ```shell

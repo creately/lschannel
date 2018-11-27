@@ -1,6 +1,6 @@
 {
   "name": "@creately/lschannel-es6",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -21,22 +21,21 @@
   "author": "Muhammed Thanish <mnmtanish@gmail.com> (http://thanish.me/)",
   "license": "MIT",
   "devDependencies": {
-    "@types/jasmine": "^2.8.6",
-    "istanbul-instrumenter-loader": "^3.0.0",
-    "jasmine-core": "^2.9.1",
-    "karma": "^1.7.1",
+    "@types/jasmine": "^3.3.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "jasmine-core": "^3.3.0",
+    "karma": "^3.1.1",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-coverage-istanbul-reporter": "^1.4.1",
-    "karma-jasmine": "^1.1.1",
-    "karma-webpack": "^2.0.9",
-    "prettier": "^1.10.2",
+    "karma-coverage-istanbul-reporter": "^2.0.4",
+    "karma-jasmine": "^2.0.1",
+    "karma-webpack": "^3.0.5",
+    "prettier": "^1.15.2",
     "rimraf": "^2.6.2",
-    "ts-loader": "^2.3.7",
-    "typescript": "^2.7.1",
-    "webpack": "^3.10.0"
+    "ts-loader": "^5.3.1",
+    "typescript": "^3.1.6",
+    "webpack": "^4.26.1"
   },
   "dependencies": {
-    "rxjs": "^6.0.0",
-    "rxjs-compat": "^6.0.0"
+    "rxjs": "^6.0.0"
   }
 }

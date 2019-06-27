@@ -85,7 +85,7 @@ describe('Channel', () => {
   });
 
   it('should emit even when it fails to set the value on local storage', done => {
-    spyOn( localStorage, 'setItem' ).and.throwError('example error');
+    spyOn(localStorage, 'setItem').and.throwError('example error');
     const action = (_key: string, ch: Channel<number>) => {
       ch.next(1);
       ch.next(2);

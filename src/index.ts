@@ -62,7 +62,7 @@ export class Channel<T> extends Subject<T> {
     try {
       localStorage.setItem(this.key, value);
     } catch (err) {
-      console.error(err.message);
+      console.error(err);
     }
     this.emit(data);
   }

@@ -59,7 +59,11 @@ export class Channel<T> extends Subject<T> {
   public next(data: T): void {
     const event = { id: this.nextId(), data };
     const value = JSON.stringify(event);
-    localStorage.setItem(this.key, value);
+    try {
+      localStorage.setItem(this.key, value);
+    } catch (err) {
+      console.error(err.message);
+    }
     this.emit(data);
   }
 

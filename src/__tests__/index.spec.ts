@@ -84,6 +84,18 @@ describe('Channel', () => {
     takeAndTest(2, action, assert, done);
   });
 
+  it('should emit even when it fails to set the value on local storage', done => {
+    spyOn(localStorage, 'setItem').and.throwError('example error');
+    const action = (_key: string, ch: Channel<number>) => {
+      ch.next(1);
+      ch.next(2);
+    };
+    const assert = (val: any) => {
+      expect(val).toEqual([1, 2]);
+    };
+    takeAndTest(2, action, assert, done);
+  });
+
   describe('next', () => {
     it('should return undefined', () => {
       const { ch } = prepare();

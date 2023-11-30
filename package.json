@@ -1,5 +1,5 @@
 {
-  "name": "@creately/lschannel",
+  "name": "@creately/lschannel-es6",
   "version": "2.0.3",
   "description": "",
   "main": "dist/index.js",
